@@ -3,10 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cuota;
+use App\Models\Venta;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CuotaController extends Controller
 {
+
+    public function createPago($venta_id)
+    {
+        $venta = Venta::findOrFail($venta_id);
+        Cuota::create([
+            'venta_id' => $venta_id,
+            'numero_cuota' => 1,
+            'fecha_vencimiento' => now()->addMonth(),
+            'monto' => $venta->total,
+            'estado' => 'pendiente',
+        ]);
+        return to_route('ventas.show', $venta_id);
+    }
     /**
      * Display a listing of the resource.
      */

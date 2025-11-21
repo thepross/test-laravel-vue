@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import type { Venta, EstadoPago } from '@/types/pagofacil';
+import { Button } from '@/components/ui/button';
 
 // Definición de props tipada
 const props = defineProps<{
@@ -72,8 +73,11 @@ const claseEstado = (estado: EstadoPago): string => {
         </div>
 
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Plan de Pagos</h3>
+                <Link :href="route('cuotas.createPago', { venta_id: props.venta.id })">
+                <Button variant="default">Crear cuota</Button>
+                </Link>
             </div>
             <ul v-if="props.venta.cuotas" role="list" class="divide-y divide-gray-200">
                 <li v-for="cuota in props.venta.cuotas" :key="cuota.id" class="px-4 py-4 sm:px-6 hover:bg-gray-50">

@@ -23,8 +23,8 @@ class PagoFacilService
             'amount' => $cuota->monto,
             'currency' => 2,
             'clientCode' => "CLI-" . $cliente->id,
-            'callbackUrl' => route('pagofacil.callback'),
-            // 'callbackUrl' => "https://thepross.xyz/pagos/callback",
+            // 'callbackUrl' => route('pagofacil.callback'),
+            'callbackUrl' => "https://thepross.xyz/pagos/callback",
             'orderDetail' => [
                 [
                     'serial' => $cuota->id,

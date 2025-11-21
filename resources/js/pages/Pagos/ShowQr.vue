@@ -13,7 +13,9 @@ const cuotaActual = ref<Cuota>(props.cuota);
 
 // Variable para controlar el intervalo del sondeo
 let pollInterval: ReturnType<typeof setInterval> | null = null;
+let countdownInterval: ReturnType<typeof setInterval> | null = null;
 const isPolling = ref(false);
+const isCountdown = ref(false);
 
 // 2. Lógica de Polling (Verificación en tiempo real)
 const startPolling = () => {
@@ -50,13 +52,45 @@ const stopPolling = () => {
     isPolling.value = false;
 };
 
+const tiempoRestante = ref(4);
+
+const formatoTiempo = (segundos: number): string => {
+    const minutos = Math.floor(segundos / 60);
+    const segundosRestantes = segundos % 60;
+    return `${minutos}:${segundosRestantes < 10 ? '0' : ''}${segundosRestantes}`;
+};
+
+const actualizarTiempoRestante = () => {
+    tiempoRestante.value--;
+    if (tiempoRestante.value <= 0) {
+        stopPolling();
+        stopCountdown();
+    }
+};
+
+const startCountdown = () => {
+    tiempoRestante.value = 4; // 5 minutos
+    countdownInterval = setInterval(actualizarTiempoRestante, 1000); // Actualizar cada segundo
+    isCountdown.value = true;
+};
+
+const stopCountdown = () => {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    isCountdown.value = false;
+};
+
 // 3. Ciclo de Vida del Componente
 onMounted(() => {
     startPolling();
+    startCountdown();
 });
 
 onUnmounted(() => {
     stopPolling(); // Limpieza obligatoria para evitar fugas de memoria
+    stopCountdown();
 });
 
 // Helper de formato
@@ -153,13 +187,20 @@ const formatoMoneda = (valor: number): string => {
                         <span class="text-sm text-indigo-600 font-medium animate-pulse">Esperando pago...</span>
                     </div>
 
+                    <div class="flex items-center justify-center mb-8 space-x-2">
+                        <span class="text-2xl font-bold text-indigo-600 animate-pulse">{{ formatoTiempo(tiempoRestante)
+                            }}</span>
+                    </div>
+
+
+
                     <div class="border-t border-gray-200 pt-6">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-sm text-gray-500">Total a pagar:</span>
                             <span class="text-2xl font-bold text-gray-900">{{ formatoMoneda(props.cuota.monto) }}</span>
                         </div>
                         <div class="text-xs text-gray-400">
-                            El código expira en 24 horas.
+                            El código expira en 5 minutos.
                         </div>
                     </div>
                 </div>

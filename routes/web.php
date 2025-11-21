@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\PagoFacilWebHookController;
 use App\Http\Controllers\ProductController;
@@ -26,8 +27,16 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-    Route::get('/ventas/{venta}', [VentaController::class, 'show'])->name('ventas.show');
+    Route::get('/cuotas/create/{venta_id}', [CuotaController::class, 'createPago'])->name('cuotas.createPago');
     Route::get('/pagar/cuota/{cuota}', [PagoController::class, 'show'])->name('pagofacil.pagar.cuota');
+
+    Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
+    Route::get('/ventas/create', [VentaController::class, 'create'])->name('ventas.create');
+    Route::post('/ventas', [VentaController::class, 'store'])->name('ventas.store');
+    Route::get('/ventas/{venta}/show', [VentaController::class, 'show'])->name('ventas.show');
+    Route::get('/ventas/{venta}/edit', [VentaController::class, 'edit'])->name('ventas.edit');
+    Route::put('/ventas/{venta}', [VentaController::class, 'update'])->name('ventas.update');
+    Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ventas.destroy');
 });
 
 

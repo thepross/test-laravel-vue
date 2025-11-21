@@ -13,7 +13,15 @@ class VentaController extends Controller
      */
     public function index()
     {
-        //
+        $ventas = Venta::all();
+        return Inertia::render('Ventas/Index', [
+            'ventas' => $ventas,
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Ventas/Create');
     }
 
     /**
@@ -21,7 +29,19 @@ class VentaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'cliente_id' => 'required',
+            'concepto' => 'required',
+            'total' => 'required',
+        ]);
+
+        Venta::create([
+            'cliente_id' => $request->cliente_id,
+            'concepto' => $request->concepto,
+            'total' => $request->total,
+        ]);
+
+        return redirect()->route('ventas.index')->with('success', 'Venta creada correctamente');
     }
 
     /**
