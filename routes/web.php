@@ -18,7 +18,6 @@ Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
@@ -33,7 +32,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::post('/pagofacil/callback', [PagoFacilWebHookController::class, 'callback'])
-    ->name('api.pagofacil.callback');
+    ->name('pagofacil.callback');
 
 
 require __DIR__ . '/settings.php';

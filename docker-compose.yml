@@ -1,0 +1,42 @@
+services:
+  # 1. Aplicación Laravel (Apache + PHP)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pagofacil-apache
+    container_name: pagofacil_app
+    restart: unless-stopped
+    ports:
+      - '80:80' # El puerto 80 ahora lo maneja Apache directamente
+    volumes:
+      - ./:/var/www/html
+      - ./docker/entrypoint.sh:/usr/local/bin/entrypoint.sh
+    networks:
+      - pagofacil_net
+    entrypoint: ['sh', '/usr/local/bin/entrypoint.sh']
+    depends_on:
+      - db
+
+  # 2. Base de Datos (PostgreSQL)
+  db:
+    image: postgres:15
+    container_name: pagofacil_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - pagofacil_net
+
+volumes:
+  dbdata:
+
+networks:
+  pagofacil_net:
+    driver: bridge

@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Http;
 
 class PagoFacilService
 {
-    protected $baseUrl = 'https://masterqr.pagofacil.com.bo/api/services/v2';
-
     public function generarQrParaCuota($cuota)
     {
         $token = $this->getAccessToken();
@@ -25,7 +23,8 @@ class PagoFacilService
             'amount' => $cuota->monto,
             'currency' => 2,
             'clientCode' => "CLI-" . $cliente->id,
-            'callbackUrl' => "https://tu-dominio.com/callback",
+            'callbackUrl' => route('pagofacil.callback'),
+            // 'callbackUrl' => "https://thepross.xyz/pagos/callback",
             'orderDetail' => [
                 [
                     'serial' => $cuota->id,
@@ -38,18 +37,10 @@ class PagoFacilService
             ]
         ];
 
-        // echo "<pre>";
-        // print_r(json_encode($data));
-        // echo "</pre>";
-        // exit;
-
-
-        $response = Http::withToken($token)->post($this->baseUrl . '/generate-qr', $data);
-        // dd($response);
+        $response = Http::withToken($token)->post(config('services.pagofacil.base_url') . '/generate-qr', $data);
         if ($response->successful() && (int) $response->json('error') === 0) {
             return $response->json('values');
         }
-        // dd($response->json());
         throw new \Exception('Error al generar el QR de Pago Facil: ' . $response->body());
     }
 
@@ -59,8 +50,7 @@ class PagoFacilService
             $response = Http::withHeaders([
                 'tcTokenService' => config('services.pagofacil.service_token'),
                 'tcTokenSecret' => config('services.pagofacil.secret_token'),
-            ])->post("{$this->baseUrl}/login");
-            // dd($response->json('values.accessToken'));
+            ])->post(config('services.pagofacil.base_url') . '/login');
             return $response->json('values.accessToken');
         });
     }

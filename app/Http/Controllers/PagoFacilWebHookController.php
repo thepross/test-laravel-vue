@@ -18,10 +18,11 @@ class PagoFacilWebHookController extends Controller
         $cuotaId = preg_match('/C(\d+)$/', $pedidoID, $matches) ? $matches[1] : $pedidoID;
 
         $cuota = Cuota::find($cuotaId);
-        if ($cuota && $data['Estado'] === 'Pagado') {
+        // dd($cuota, $data);
+        if ($cuota /*&& $data['Estado'] === 'Pagado'*/) {
             $cuota->update([
                 'estado' => 'pagado',
-                'pagofacil_transaction_id' => $data['TransactionId'] ?? null,
+                // 'pagofacil_transaction_id' => $data['TransactionId'] ?? null,
                 'updated_at' => now(),
             ]);
 

@@ -9,6 +9,8 @@ const props = defineProps<{
     qrImage: string;
 }>();
 
+const cuotaActual = ref<Cuota>(props.cuota);
+
 // Variable para controlar el intervalo del sondeo
 let pollInterval: ReturnType<typeof setInterval> | null = null;
 const isPolling = ref(false);
@@ -16,7 +18,7 @@ const isPolling = ref(false);
 // 2. Lógica de Polling (Verificación en tiempo real)
 const startPolling = () => {
     // Si ya está pagado, no hacemos nada
-    if (props.cuota.estado === 'pagado') return;
+    if (cuotaActual.value.estado === 'pagado') return; // Usamos la local
 
     isPolling.value = true;
 
@@ -28,6 +30,7 @@ const startPolling = () => {
             onSuccess: (page) => {
                 // Verificamos el dato actualizado que viene del servidor
                 const updatedCuota = (page.props as any).cuota as Cuota;
+                cuotaActual.value = updatedCuota;
 
                 // Si el estado cambió a 'pagado', detenemos el sondeo
                 if (updatedCuota.estado === 'pagado') {
@@ -87,13 +90,13 @@ const formatoMoneda = (valor: number): string => {
 
                     <h3 class="text-2xl leading-6 font-bold text-gray-900 mb-2">¡Pago Realizado!</h3>
                     <p class="text-gray-500 mb-6">
-                        Su cuota #{{ props.cuota.numero_cuota }} ha sido cancelada correctamente.
+                        Su cuota #{{ cuotaActual.numero_cuota }} ha sido cancelada correctamente.
                     </p>
 
                     <div class="bg-gray-50 p-4 rounded-md mb-6">
                         <dl class="flex justify-between text-sm font-medium text-gray-600">
                             <dt>Transacción:</dt>
-                            <dd class="text-gray-900 font-mono">{{ props.cuota.pagofacil_transaction_id }}</dd>
+                            <dd class="text-gray-900 font-mono">{{ cuotaActual.pagofacil_transaction_id }}</dd>
                         </dl>
                         <dl class="flex justify-between text-sm font-medium text-gray-600 mt-2">
                             <dt>Fecha:</dt>
@@ -108,9 +111,13 @@ const formatoMoneda = (valor: number): string => {
                 </div>
 
                 <div v-else>
-                    <div class="mb-4">
+                    <div class="mb-4 space-x-2">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
                             Cuota {{ props.cuota.numero_cuota }}
+                        </span>
+
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
+                            Transacción ID: {{ props.cuota.pagofacil_transaction_id }}
                         </span>
                     </div>
 
@@ -120,7 +127,7 @@ const formatoMoneda = (valor: number): string => {
 
                     <div class="flex justify-center mb-6 relative group">
                         <div
-                            class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
+                            class="absolute -inset-1 bg-linear-to-r from-blue-400 to-indigo-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
                         </div>
 
                         <img v-if="qrImage" :src="'data:image/png;base64,' + qrImage" alt="QR PagoFácil"
