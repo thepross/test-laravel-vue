@@ -38,6 +38,7 @@ class PagoController extends Controller
         return Inertia::render('Pagos/ShowQr', [
             'cuota' => $cuota,
             'qrImage' => $cuota->qr_image,
+            'callbackUrl' => route('pagofacil.callback')
         ]);
     }
 }

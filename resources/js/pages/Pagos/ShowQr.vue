@@ -7,6 +7,7 @@ import type { Cuota } from '@/types/pagofacil';
 const props = defineProps<{
     cuota: Cuota;
     qrImage: string;
+    callbackUrl: string;
 }>();
 
 const cuotaActual = ref<Cuota>(props.cuota);
@@ -52,7 +53,7 @@ const stopPolling = () => {
     isPolling.value = false;
 };
 
-const tiempoRestante = ref(4);
+const tiempoRestante = ref(300);
 
 const formatoTiempo = (segundos: number): string => {
     const minutos = Math.floor(segundos / 60);
@@ -69,7 +70,7 @@ const actualizarTiempoRestante = () => {
 };
 
 const startCountdown = () => {
-    tiempoRestante.value = 4; // 5 minutos
+    tiempoRestante.value = 300; // 5 minutos
     countdownInterval = setInterval(actualizarTiempoRestante, 1000); // Actualizar cada segundo
     isCountdown.value = true;
 };
@@ -107,7 +108,7 @@ const formatoMoneda = (valor: number): string => {
                 Pago con QR
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600">
-                {{ props.cuota.venta?.concepto }}
+                {{ props.cuota.venta?.concepto }} | {{ props.callbackUrl }}
             </p>
         </div>
 
