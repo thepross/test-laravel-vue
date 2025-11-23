@@ -5,6 +5,9 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\PagoFacilWebHookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VentaController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -42,6 +45,41 @@ Route::middleware(['auth'])->group(function () {
 
 Route::post('/pagofacil/callback', [PagoFacilWebHookController::class, 'callback'])
     ->name('pagofacil.callback');
+
+Route::post('/puente/pagofacil/callback', function (Request $request) {
+    // 1. Capturar los datos de PagoFácil
+    $data = $request->all();
+
+    // (Opcional) Loguear para debug
+    Log::info('Callback recibido en Puente:', $data);
+
+    // 2. URL de tu proyecto destino
+    // Si estás en local, aquí pondrías tu URL de Ngrok: https://mi-tunnel.ngrok.io/api/pagofacil/webhook
+    $targetUrl = 'https://localhost:8000/pagofacil/callback';
+
+    // 3. Reenviar la petición (FORWARD)
+    try {
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'X-Bridge-Secret' => 'secret123' // Para seguridad
+            ])
+            ->post($targetUrl, $data);
+
+        Log::info('Reenviado con éxito. Respuesta: ' . $response->status());
+
+        // 4. Responder a PagoFácil que todo salió bien
+        return response()->json([
+            'error' => 0,
+            'status' => 1,
+            'message' => 'Recibido y reenviado',
+            'values' => true,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error reenviando: ' . $e->getMessage());
+        // Aún así respondemos 200 a PagoFácil para que no siga reintentando infinitamente si el fallo es nuestro
+        return response()->json(['status' => 0, 'message' => 'Error interno en puente'], 200);
+    }
+});
 
 
 require __DIR__ . '/settings.php';
