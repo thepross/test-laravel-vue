@@ -7,10 +7,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -49,13 +49,14 @@ Route::post('/pagofacil/callback', [PagoFacilWebHookController::class, 'callback
 Route::post('/puente/pagofacil/callback', function (Request $request) {
     // 1. Capturar los datos de PagoFácil
     $data = $request->all();
+    // dd($data);
 
     // (Opcional) Loguear para debug
     Log::info('Callback recibido en Puente:', $data);
 
     // 2. URL de tu proyecto destino
     // Si estás en local, aquí pondrías tu URL de Ngrok: https://mi-tunnel.ngrok.io/api/pagofacil/webhook
-    $targetUrl = 'https://localhost:8000/pagofacil/callback';
+    $targetUrl = 'http://127.0.0.1:8001/pagofacil/callback';
 
     // 3. Reenviar la petición (FORWARD)
     try {
