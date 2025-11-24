@@ -56,7 +56,7 @@ Route::post('/puente/pagofacil/callback', function (Request $request) {
 
     // 2. URL de tu proyecto destino
     // Si estás en local, aquí pondrías tu URL de Ngrok: https://mi-tunnel.ngrok.io/api/pagofacil/webhook
-    $targetUrl = 'http://127.0.0.1:8001/pagofacil/callback';
+    $targetUrl = 'https://mail.tecnoweb.org.bo/inf513/grupo05sc/estetica-laser/public/pagofacil/callback';
 
     // 3. Reenviar la petición (FORWARD)
     try {
